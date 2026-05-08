@@ -81,7 +81,7 @@ function calc() {
   }
 
   // 1. 체중 기준
-  let weightLimit = w * 2.5;
+  let weightLimit = w * 4;
 
   // 2. 연령 기준
   let ageLimit;
@@ -91,7 +91,7 @@ function calc() {
     ageLimit = 400;
     ageText = "성인 기준 (400mg)";
   } else {
-    ageLimit = 100;
+    ageLimit = w * 3;
     ageText = "청소년 기준 (100mg)";
   }
 
