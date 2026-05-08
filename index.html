@@ -1,148 +1,147 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>카페인 섭취량 계산기</title>
-
+  <meta charset="UTF-8">
+  <title>카페인 섭취 분석 & 음료 추천</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
-      padding: 40px;
+      font-family: Arial;
+      background: #f2f4f8;
       text-align: center;
+      padding: 30px;
     }
 
-    .container {
-      max-width: 500px;
-      margin: auto;
+    .box {
       background: white;
-      padding: 30px;
+      padding: 25px;
+      max-width: 600px;
+      margin: auto;
       border-radius: 15px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    h1 {
-      color: #333;
-    }
-
-    input {
+    input, select {
       width: 80%;
-      padding: 12px;
-      margin-top: 15px;
-      font-size: 16px;
+      padding: 10px;
+      margin: 8px;
     }
 
     button {
-      margin-top: 20px;
-      padding: 12px 25px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      background-color: #4a90e2;
+      padding: 10px 20px;
+      background: #4a90e2;
       color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #357abd;
-    }
-
-    .result {
-      margin-top: 30px;
-      text-align: left;
-    }
-
-    .drink {
-      background-color: #eef4ff;
-      padding: 10px;
+      border: none;
       border-radius: 8px;
+      cursor: pointer;
       margin-top: 10px;
     }
 
-    .warning {
-      margin-top: 20px;
-      color: #cc0000;
-      font-size: 14px;
+    .drink {
+      text-align: left;
+      background: #eef5ff;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    .warn {
+      color: red;
+      font-size: 13px;
+      margin-top: 15px;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
-    <h1>☕ 카페인 섭취량 계산기</h1>
+<div class="box">
+  <h2>☕ 카페인 섭취 분석 & 음료 추천</h2>
 
-    <p>몸무게(kg)를 입력하세요</p>
+  <input type="number" id="weight" placeholder="몸무게 (kg)">
 
-    <input type="number" id="weight" placeholder="예: 50">
+  <select id="age">
+    <option value="teen">청소년 (13~18)</option>
+    <option value="adult">성인 (19+)</option>
+  </select>
 
-    <br>
+  <select id="gender">
+    <option value="male">남성</option>
+    <option value="female">여성</option>
+  </select>
 
-    <button onclick="calculateCaffeine()">
-      계산하기
-    </button>
+  <button onclick="calc()">계산하기</button>
 
-    <div class="result" id="result"></div>
-  </div>
+  <div id="result"></div>
+</div>
 
-  <script>
-    function calculateCaffeine() {
+<script>
+function calc() {
+  const w = Number(document.getElementById("weight").value);
+  const age = document.getElementById("age").value;
+  const gender = document.getElementById("gender").value;
 
-      const weight = document.getElementById("weight").value;
-      const resultDiv = document.getElementById("result");
+  const result = document.getElementById("result");
 
-      if(weight <= 0 || weight === "") {
-        resultDiv.innerHTML = "<p>올바른 몸무게를 입력해주세요.</p>";
-        return;
-      }
+  if (!w || w <= 0) {
+    result.innerHTML = "올바른 몸무게 입력";
+    return;
+  }
 
-      // 체중 × 2.5mg 기준
-      const recommended = Math.round(weight * 2.5);
+  // 기본 기준
+  let limitByWeight = w * 2.5;
 
-      // 음료 데이터
-      const drinks = [
-        { name: "아메리카노", caffeine: 150 },
-        { name: "콜라", caffeine: 35 },
-        { name: "녹차", caffeine: 30 },
-        { name: "에너지 드링크", caffeine: 80 },
-        { name: "초코라떼", caffeine: 15 },
-        { name: "밀크티", caffeine: 70 },
-        { name: "디카페인 커피", caffeine: 10 }
-      ];
+  // 연령 기준 추가
+  let finalLimit;
 
-      let availableDrinks = "";
+  if (age === "adult") {
+    finalLimit = Math.min(limitByWeight, 400);
+  } else {
+    // 청소년은 더 보수적으로 제한
+    finalLimit = Math.min(limitByWeight, 100);
+  }
 
-      drinks.forEach(drink => {
-        if(drink.caffeine <= recommended) {
-          availableDrinks += `
-            <div class="drink">
-              <strong>${drink.name}</strong><br>
-              카페인 함량: ${drink.caffeine}mg
-            </div>
-          `;
-        }
-      });
+  // 성별은 계산에 영향 X (과학적으로 큰 차이 없음)
+  let drinks = [
+    { name: "스타벅스 아메리카노 (Tall)", caf: 150, price: 4500 },
+    { name: "스타벅스 콜드브루", caf: 155, price: 5000 },
+    { name: "레드불 (250ml)", caf: 80, price: 2500 },
+    { name: "몬스터 에너지 (355ml)", caf: 120, price: 3000 },
+    { name: "핫식스 (250ml)", caf: 70, price: 2000 },
+    { name: "이디야 아메리카노", caf: 140, price: 3500 },
+    { name: "녹차 (페트병 기준)", caf: 30, price: 1800 },
+    { name: "디카페인 커피", caf: 10, price: 4500 }
+  ];
 
-      resultDiv.innerHTML = `
-        <h2>결과</h2>
+  let list = "";
 
-        <p>
-          체중 <strong>${weight}kg</strong> 기준<br>
-          권장 최대 카페인 섭취량은
-          <strong>${recommended}mg</strong> 입니다.
-        </p>
-
-        <h3>추천 가능한 음료</h3>
-
-        ${availableDrinks}
-
-        <p class="warning">
-          ※ 개인 건강 상태에 따라 적정 카페인 섭취량은 달라질 수 있습니다.
-        </p>
+  drinks.forEach(d => {
+    if (d.caf <= finalLimit) {
+      list += `
+        <div class="drink">
+          <b>${d.name}</b><br>
+          카페인: ${d.caf}mg<br>
+          가격: 약 ${d.price}원
+        </div>
       `;
     }
-  </script>
+  });
+
+  result.innerHTML = `
+    <h3>결과</h3>
+    <p>
+      체중 ${w}kg / ${age === "adult" ? "성인" : "청소년"} 기준<br>
+      권장 최대 카페인: <b>${Math.round(finalLimit)}mg</b>
+    </p>
+
+    <h4>섭취 가능 음료</h4>
+    ${list}
+
+    <p class="warn">
+      ※ 성별에 따른 카페인 권장량 차이는 과학적으로 유의미하지 않으며, 연령·체중이 주요 기준입니다.
+    </p>
+  `;
+}
+</script>
 
 </body>
 </html>
