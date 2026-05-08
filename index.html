@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>카페인 섭취량 계산기</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    input {
+      width: 80%;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #4a90e2;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #357abd;
+    }
+
+    .result {
+      margin-top: 30px;
+      text-align: left;
+    }
+
+    .drink {
+      background-color: #eef4ff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .warning {
+      margin-top: 20px;
+      color: #cc0000;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>☕ 카페인 섭취량 계산기</h1>
+
+    <p>몸무게(kg)를 입력하세요</p>
+
+    <input type="number" id="weight" placeholder="예: 50">
+
+    <br>
+
+    <button onclick="calculateCaffeine()">
+      계산하기
+    </button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function calculateCaffeine() {
+
+      const weight = document.getElementById("weight").value;
+      const resultDiv = document.getElementById("result");
+
+      if(weight <= 0 || weight === "") {
+        resultDiv.innerHTML = "<p>올바른 몸무게를 입력해주세요.</p>";
+        return;
+      }
+
+      // 체중 × 2.5mg 기준
+      const recommended = Math.round(weight * 2.5);
+
+      // 음료 데이터
+      const drinks = [
+        { name: "아메리카노", caffeine: 150 },
+        { name: "콜라", caffeine: 35 },
+        { name: "녹차", caffeine: 30 },
+        { name: "에너지 드링크", caffeine: 80 },
+        { name: "초코라떼", caffeine: 15 },
+        { name: "밀크티", caffeine: 70 },
+        { name: "디카페인 커피", caffeine: 10 }
+      ];
+
+      let availableDrinks = "";
+
+      drinks.forEach(drink => {
+        if(drink.caffeine <= recommended) {
+          availableDrinks += `
+            <div class="drink">
+              <strong>${drink.name}</strong><br>
+              카페인 함량: ${drink.caffeine}mg
+            </div>
+          `;
+        }
+      });
+
+      resultDiv.innerHTML = `
+        <h2>결과</h2>
+
+        <p>
+          체중 <strong>${weight}kg</strong> 기준<br>
+          권장 최대 카페인 섭취량은
+          <strong>${recommended}mg</strong> 입니다.
+        </p>
+
+        <h3>추천 가능한 음료</h3>
+
+        ${availableDrinks}
+
+        <p class="warning">
+          ※ 개인 건강 상태에 따라 적정 카페인 섭취량은 달라질 수 있습니다.
+        </p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
