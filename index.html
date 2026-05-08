@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>카페인 섭취 분석 & 음료 추천</title>
+  <title>카페인 분석기</title>
   <style>
     body {
       font-family: Arial;
@@ -55,18 +55,13 @@
 <body>
 
 <div class="box">
-  <h2>☕ 카페인 섭취 분석 & 음료 추천</h2>
+  <h2>☕ 카페인 섭취 분석 & 추천</h2>
 
   <input type="number" id="weight" placeholder="몸무게 (kg)">
 
   <select id="age">
     <option value="teen">청소년 (13~18)</option>
     <option value="adult">성인 (19+)</option>
-  </select>
-
-  <select id="gender">
-    <option value="male">남성</option>
-    <option value="female">여성</option>
   </select>
 
   <button onclick="calc()">계산하기</button>
@@ -78,37 +73,39 @@
 function calc() {
   const w = Number(document.getElementById("weight").value);
   const age = document.getElementById("age").value;
-  const gender = document.getElementById("gender").value;
-
   const result = document.getElementById("result");
 
   if (!w || w <= 0) {
-    result.innerHTML = "올바른 몸무게 입력";
+    result.innerHTML = "몸무게를 올바르게 입력하세요.";
     return;
   }
 
-  // 기본 기준
-  let limitByWeight = w * 2.5;
+  // 1. 체중 기준
+  let weightLimit = w * 2.5;
 
-  // 연령 기준 추가
-  let finalLimit;
+  // 2. 연령 기준
+  let ageLimit;
+  let ageText;
 
   if (age === "adult") {
-    finalLimit = Math.min(limitByWeight, 400);
+    ageLimit = 400;
+    ageText = "성인 기준 (400mg)";
   } else {
-    // 청소년은 더 보수적으로 제한
-    finalLimit = Math.min(limitByWeight, 100);
+    ageLimit = 100;
+    ageText = "청소년 기준 (100mg)";
   }
 
-  // 성별은 계산에 영향 X (과학적으로 큰 차이 없음)
+  // 3. 최종 제한
+  let finalLimit = Math.min(weightLimit, ageLimit);
+
   let drinks = [
-    { name: "스타벅스 아메리카노 (Tall)", caf: 150, price: 4500 },
+    { name: "스타벅스 아메리카노", caf: 150, price: 4500 },
     { name: "스타벅스 콜드브루", caf: 155, price: 5000 },
-    { name: "레드불 (250ml)", caf: 80, price: 2500 },
-    { name: "몬스터 에너지 (355ml)", caf: 120, price: 3000 },
-    { name: "핫식스 (250ml)", caf: 70, price: 2000 },
+    { name: "몬스터 에너지", caf: 120, price: 3000 },
+    { name: "레드불", caf: 80, price: 2500 },
+    { name: "핫식스", caf: 70, price: 2000 },
     { name: "이디야 아메리카노", caf: 140, price: 3500 },
-    { name: "녹차 (페트병 기준)", caf: 30, price: 1800 },
+    { name: "녹차", caf: 30, price: 1800 },
     { name: "디카페인 커피", caf: 10, price: 4500 }
   ];
 
@@ -119,8 +116,7 @@ function calc() {
       list += `
         <div class="drink">
           <b>${d.name}</b><br>
-          카페인: ${d.caf}mg<br>
-          가격: 약 ${d.price}원
+          카페인: ${d.caf}mg / 가격: ${d.price}원
         </div>
       `;
     }
@@ -128,16 +124,19 @@ function calc() {
 
   result.innerHTML = `
     <h3>결과</h3>
+
     <p>
-      체중 ${w}kg / ${age === "adult" ? "성인" : "청소년"} 기준<br>
-      권장 최대 카페인: <b>${Math.round(finalLimit)}mg</b>
+      체중 기준: ${Math.round(weightLimit)}mg<br>
+      ${ageText}<br><br>
+
+      👉 최종 권장 섭취량: <b>${Math.round(finalLimit)}mg</b>
     </p>
 
     <h4>섭취 가능 음료</h4>
     ${list}
 
     <p class="warn">
-      ※ 성별에 따른 카페인 권장량 차이는 과학적으로 유의미하지 않으며, 연령·체중이 주요 기준입니다.
+      ※ 실제 권장 기준은 개인 건강 상태에 따라 달라질 수 있습니다.
     </p>
   `;
 }
